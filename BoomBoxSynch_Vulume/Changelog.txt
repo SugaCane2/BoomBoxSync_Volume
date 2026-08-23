@@ -1,0 +1,20 @@
+﻿0.1.5:
+- 
+- 
+- 
+- 
+
+0.1.4:
+- Debug Logs hinzugefügt
+- "Ghost Radio" gefixt. Sollte jetzt gescheit Synchronisiert sein
+- Settings gefixt
+
+0.1.3:
+- "Übersteuerung" Lautstärke Regler für das Radio hinzugefügt
+- Löschung der "Ghost Radios" beim einstecken gefixt
+- Löschfunktion aller "Ghost Radios" in den Einstellungen hinzugefügt
+
+0.1.2:
+- Relead Button hinzugefügt
+- Maxuimum auf 100 erhöht
+- Statt Eingabefeld zum Slider mit Automatischer Übernahme Funktion

@@ -1,0 +1,11 @@
+{
+    "Id": "BoomboxSyncMod",
+    "DisplayName": "Boombox Sync & Volume Boost",
+    "Author": "SugaCane",
+    "Version": "0.1.4",
+    "ManagerVersion": "0.27.0",
+    "Requirements": [ "Multiplayer" ],
+    "LoadAfter": [ "Multiplayer" ],
+    "AssemblyName": "BoomBoxSync_Volume.dll",
+    "EntryMethod": "BoomboxSyncMod.Main.Load"
+}

@@ -9,6 +9,11 @@ namespace BoomboxSyncMod
     public class BoomboxStatePacket : ISerializablePacket
     {
         public int BoomboxId;
+
+        // V2.0 Features:
+        public string OwnerName;       // Speichert den Namen des Spielers (UTF-8 sicher!)
+        public bool IsInInventory;     // Ist das Radio gerade eingesteckt?
+
         public bool IsPlaying;
         public string StreamUrl;
         public int StationIndex;
@@ -18,6 +23,8 @@ namespace BoomboxSyncMod
         public void Serialize(BinaryWriter writer)
         {
             writer.Write(BoomboxId);
+            writer.Write(OwnerName ?? "Unbekannt");
+            writer.Write(IsInInventory);
             writer.Write(IsPlaying);
             writer.Write(StreamUrl ?? "");
             writer.Write(StationIndex);
@@ -28,6 +35,8 @@ namespace BoomboxSyncMod
         public void Deserialize(BinaryReader reader)
         {
             BoomboxId = reader.ReadInt32();
+            OwnerName = reader.ReadString();
+            IsInInventory = reader.ReadBoolean();
             IsPlaying = reader.ReadBoolean();
             StreamUrl = reader.ReadString();
             StationIndex = reader.ReadInt32();
@@ -61,15 +70,8 @@ namespace BoomboxSyncMod
     {
         public int BoomboxId;
 
-        public void Serialize(BinaryWriter writer)
-        {
-            writer.Write(BoomboxId);
-        }
-
-        public void Deserialize(BinaryReader reader)
-        {
-            BoomboxId = reader.ReadInt32();
-        }
+        public void Serialize(BinaryWriter writer) { writer.Write(BoomboxId); }
+        public void Deserialize(BinaryReader reader) { BoomboxId = reader.ReadInt32(); }
     }
 
     public class BoomboxClearAllPacket : ISerializablePacket
@@ -97,13 +99,16 @@ namespace BoomboxSyncMod
             MultiplayerAPI.Client.SendSerializablePacketToServer(packet, false);
         }
 
-        public static void SendBoomboxState(int boomboxId, bool isPlaying, string streamUrl, int stationIndex, Vector3 pos, Quaternion rot)
+        // ACHTUNG V2.0: Neue optionale Parameter am Ende, damit die alten Dateien erstmal nicht kaputtgehen
+        public static void SendBoomboxState(int boomboxId, bool isPlaying, string streamUrl, int stationIndex, Vector3 pos, Quaternion rot, string ownerName = "LocalPlayer", bool isInInventory = false)
         {
             if (!MultiplayerAPI.IsMultiplayerLoaded || MultiplayerAPI.Client == null || !MultiplayerAPI.Client.IsConnected) return;
 
             var packet = new BoomboxStatePacket
             {
                 BoomboxId = boomboxId,
+                OwnerName = ownerName,
+                IsInInventory = isInInventory,
                 IsPlaying = isPlaying,
                 StreamUrl = streamUrl,
                 StationIndex = stationIndex,
@@ -116,7 +121,6 @@ namespace BoomboxSyncMod
         public static void SendDespawnPacket(int boomboxId)
         {
             if (!MultiplayerAPI.IsMultiplayerLoaded || MultiplayerAPI.Client == null || !MultiplayerAPI.Client.IsConnected) return;
-
             var packet = new BoomboxDespawnPacket { BoomboxId = boomboxId };
             MultiplayerAPI.Client.SendSerializablePacketToServer(packet, true);
         }
@@ -124,7 +128,6 @@ namespace BoomboxSyncMod
         public static void SendClearAllPacket()
         {
             if (!MultiplayerAPI.IsMultiplayerLoaded || MultiplayerAPI.Client == null || !MultiplayerAPI.Client.IsConnected) return;
-
             var packet = new BoomboxClearAllPacket();
             MultiplayerAPI.Client.SendSerializablePacketToServer(packet, true);
         }
@@ -141,7 +144,7 @@ namespace BoomboxSyncMod
 
             if (packet.IsPlaying)
             {
-                // HIER: packet.StreamUrl als zweiten Parameter eingefügt!
+                // Für den Moment übergeben wir die Daten noch an das alte System, bis wir Schritt 2 gebaut haben
                 GhostBoomboxManager.PlayRadioOnGhost(packet.BoomboxId, packet.StreamUrl, packet.StationIndex, packet.Position, packet.Rotation);
             }
             else
@@ -161,6 +164,7 @@ namespace BoomboxSyncMod
             GhostBoomboxManager.ClearAllGhosts();
         }
 
+        // SERVER-SEITE: Hier injecten wir später den echten Namen!
         public static void OnServerTransformReceived(BoomboxTransformPacket packet, IPlayer sender)
         {
             MultiplayerAPI.Server.SendSerializablePacketToAll(packet, false, false, sender);
@@ -169,6 +173,12 @@ namespace BoomboxSyncMod
 
         public static void OnServerStateReceived(BoomboxStatePacket packet, IPlayer sender)
         {
+            // V2.0 MAGIE: Der Server überschreibt den OwnerName automatisch mit dem echten Namen des Spielers, der das Paket gesendet hat!
+            if (sender != null && !string.IsNullOrEmpty(sender.Username))
+            {
+                packet.OwnerName = sender.Username;
+            }
+
             MultiplayerAPI.Server.SendSerializablePacketToAll(packet, true, false, sender);
             OnClientStateReceived(packet);
         }
@@ -193,7 +203,6 @@ namespace BoomboxSyncMod
         void Update()
         {
             if (!MultiplayerAPI.IsMultiplayerLoaded) return;
-
             bool isConnected = MultiplayerAPI.Client != null && MultiplayerAPI.Client.IsConnected;
 
             if (isConnected && !isRegisteredForSession)
@@ -210,7 +219,6 @@ namespace BoomboxSyncMod
                     MultiplayerAPI.Server.RegisterSerializablePacket<BoomboxDespawnPacket>(NetworkSync.OnServerDespawnReceived);
                     MultiplayerAPI.Server.RegisterSerializablePacket<BoomboxClearAllPacket>(NetworkSync.OnServerClearAllReceived);
                 }
-
                 isRegisteredForSession = true;
             }
             else if (!isConnected && isRegisteredForSession)

@@ -1,33 +1,57 @@
-# 📻 BoomboxSyncMod für Unity Mod Manager
+# 📻 BoomboxSyncMod for Unity Mod Manager
 
-**BoomboxSyncMod** ist eine Unity-Mod, die das Multiplayer-Erlebnis in Spielen durch eine präzise und performante Synchronisation von Radio-Streams und Boomboxes auf ein neues Level hebt. Egal ob Web-Streams (wie FFH, TruckersFM oder Simulator Radio) oder individuelle Musik – die Mod sorgt dafür, dass alle Spieler exakt dasselbe zur gleichen Zeit hören.
+**BoomboxSyncMod** is a Unity mod that takes the multiplayer experience in games to a whole new level through precise and high-performance synchronization of radio streams and boomboxes. Whether it’s web streams (such as FFH, TruckersFM, or Simulator Radio) or custom music—the mod ensures that all players hear exactly the same thing at the same time.
 
 ---
 
 ## ✨ Features (Version 2.0)
 
-*   **Vollständige Audio-Synchronisation:** Radios und Boomboxes bewegen sich flüssig mit den Spielern und synchronisieren Streams live im Multiplayer.
-*   **Intelligentes Inventar-Verhalten:** Du hast in den Einstellungen die volle Kontrolle darüber, ob dein Radio im Inventar oder in der Hand weiterhin den Ton an Mitspieler überträgt oder stummgeschaltet bleibt. Für dich selbst läuft deine Musik natürlich immer weiter!
-*   **🎛️ DJ-Pult (Mute-Tabelle):** In den Mod-Einstellungen findest du eine übersichtliche Liste aller aktiven Spieler-Radios in deiner Welt. Mit einem Klick kannst du störende Radios einzelner Mitspieler komplett stummschalten.
-*   **Saubere Playlisten (Auto-Backup):** Fremde Radio-Streams von Mitspielern werden für das Laden im Arbeitsspeicher kurzzeitig genutzt, ohne dauerhaft deine lokale `Radio.pls`-Datei zuzumüllen.
-*   **Lautstärke & Overdrive:** Passe die maximale Reichweite individuell an und nutze optional den Overdrive-Boost für mehr Power.
-*   **Performance-Optimierung:** Ein intelligentes Radar- und Culling-System kappt Streams im Hintergrund, wenn Spieler zu weit entfernt sind.
+*   **Full Audio Synchronization:** Radios and boomboxes move smoothly with the players and synchronize streams live in multiplayer.
+*   **Smart Inventory Behavior:** In the settings, you have full control over whether your radio—whether in your inventory or in your hand—continues to broadcast audio to other players or remains muted. Of course, your own music will keep playing for you!
+*   **🎛️ DJ Console (Mute Table):** In the mod settings, you’ll find a clear list of all active player radios in your world. With a single click, you can completely mute disruptive radios from individual players.
+*   **Clean Playlists (Auto-Backup):** Radio streams from other players are temporarily loaded into RAM without permanently cluttering your local `Radio.pls` file.
+*   **Volume & Overdrive:** Customize the maximum range and optionally use the Overdrive boost for more power.
+*   **Performance Optimization:** An intelligent radar and culling system caps 
+*   **Clean Playlists (Auto-Backup):** Third-party radio streams from other players are temporarily loaded into RAM without permanently cluttering your local `Radio.pls` file.
+
+*   **Volume & Overdrive:** Customize the maximum range and optionally use the Overdrive boost for more power.
+
+*   **Performance Optimization:** An intelligent radar and culling system cuts off streams in the background when players are too far away.
+
+
 
 ---
+
+
 
 ## ⚙️ Installation
 
-1. Stelle sicher, dass der **Unity Mod Manager (UMM)** für dein Spiel installiert ist.
-2. Lade die neueste Version von BoomboxSyncMod herunter.
-3. Entpacke den Mod-Ordner in das `Mods`-Verzeichnis deines Spiels oder installiere die ZIP-Datei direkt über den UMM.
-4. Starte das Spiel und öffne die UMM-Einstellungen (Strg + F10), um deine Konfiguration anzupassen.
+
+
+1. Make sure the **Unity Mod Manager (UMM)** is installed for your game.
+
+2. Download the latest version of BoomboxSyncMod.
+
+3. Extract the mod folder into your game’s `Mods` directory or install the ZIP file directly via the UMM.
+
+4. Launch the game and open the UMM settings (Ctrl + F10) to customize your configuration.
+
+
 
 ---
 
-## 🛠️ Einstellungen
 
-*   **Max. Lautstärke-Reichweite:** Bestimmt, wie weit der Ton zu hören ist.
-*   **Overdrive Boost:** Verstärkt die Lautstärke über das Standard-Limit hinaus (Achtung, kann laut werden!).
-*   **Radar-Puffer (Culling Distance):** Definiert den Radius, ab dem entfernte Streams zur Performance-Schonung pausiert werden.
-*   **Radio für ANDERE weiterspielen lassen:** Steuert, ob eingesteckte Radios im Inventar für Mitspieler hörbar bleiben.
-*   **DJ-Pult:** Aktive Spieler anzeigen und bei Bedarf individuell stummschalten.
+
+## 🛠️ Settings
+
+
+
+*   **Max. Volume Range:** Determines how far the sound can be heard.
+
+*   **Overdrive Boost:** Boosts the volume beyond the default limit (Warning: this can get loud!).
+
+*   **Radar Buffer (Culling Distance):** Defines the radius beyond which distant streams are paused to conserve performance.
+
+*   **Keep Radio Playing for OTHERS:** Controls whether radios equipped in your inventory remain audible to other players.
+
+*   **DJ Console:** Display active players and mute them individually as needed.

@@ -32,6 +32,9 @@ namespace BoomboxSyncMod
             {
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
                 NetworkSync.Initialize();
+
+                // V2.0: Hier starten wir unser neues Radar-System!
+                GhostBoomboxManager.InitializeRadar();
             }
             else
             {

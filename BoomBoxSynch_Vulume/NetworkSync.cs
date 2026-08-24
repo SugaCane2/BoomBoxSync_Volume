@@ -142,15 +142,8 @@ namespace BoomboxSyncMod
         {
             if (RadioTracker.IsLocalRadioId(packet.BoomboxId)) return;
 
-            if (packet.IsPlaying)
-            {
-                // Für den Moment übergeben wir die Daten noch an das alte System, bis wir Schritt 2 gebaut haben
-                GhostBoomboxManager.PlayRadioOnGhost(packet.BoomboxId, packet.StreamUrl, packet.StationIndex, packet.Position, packet.Rotation);
-            }
-            else
-            {
-                GhostBoomboxManager.StopRadioOnGhost(packet.BoomboxId);
-            }
+            // V2.0: Wir leiten ALLE Daten an den virtuellen Manager weiter!
+            GhostBoomboxManager.UpdateVirtualState(packet);
         }
 
         public static void OnClientDespawnReceived(BoomboxDespawnPacket packet)

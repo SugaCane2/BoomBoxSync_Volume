@@ -11,6 +11,26 @@ namespace BoomboxSyncMod
         public static Dictionary<RadioPlayerController, int> radioToId = new Dictionary<RadioPlayerController, int>();
         public static Dictionary<RadioPlayerController, AudioSource> radioToAudio = new Dictionary<RadioPlayerController, AudioSource>();
 
+        // --- NEU: Backup-Funktionen für die Radio.pls ---
+        public static string[] GetPlaylistBackup()
+        {
+            string path = RadioPlayerController.GetPlaylistPath();
+            if (File.Exists(path))
+            {
+                return File.ReadAllLines(path);
+            }
+            return new string[0];
+        }
+
+        public static void RestorePlaylist(string[] backupLines)
+        {
+            if (backupLines == null || backupLines.Length == 0) return;
+            string path = RadioPlayerController.GetPlaylistPath();
+            File.WriteAllLines(path, backupLines);
+            BoomboxLog.Info("[BoomboxSync] Temporärer Sender geladen. Eigene Radio.pls wurde erfolgreich wiederhergestellt.");
+        }
+        // --------------------------------------------------
+
         public static bool IsLocalRadioId(int id)
         {
             return radioToId.ContainsValue(id);
@@ -57,7 +77,7 @@ namespace BoomboxSyncMod
                         {
                             if (int.TryParse(key.Substring(4), out int fileNumber))
                             {
-                                return fileNumber - 1; // 0-basierter Index für Unity
+                                return fileNumber - 1;
                             }
                         }
                     }
@@ -66,16 +86,14 @@ namespace BoomboxSyncMod
             return -1;
         }
 
-        // NEU: Fügt fehlende Sender automatisch zur Radio.pls hinzu!
         public static int AddUrlToPlaylist(string newUrl)
         {
             string path = RadioPlayerController.GetPlaylistPath();
             if (!File.Exists(path)) return -1;
 
             List<string> lines = new List<string>(File.ReadAllLines(path));
-            int nextIndex = 1; // Start bei 1, da "File1", "File2", etc.
+            int nextIndex = 1;
 
-            // Finde die höchste vergebene Nummer in der Datei
             foreach (string line in lines)
             {
                 if (line.StartsWith("File", System.StringComparison.OrdinalIgnoreCase))
@@ -92,17 +110,28 @@ namespace BoomboxSyncMod
                 }
             }
 
-            // Neuen Sender an die Liste anhängen
             lines.Add($"File{nextIndex}={newUrl}");
             File.WriteAllLines(path, lines.ToArray());
-            BoomboxLog.Info($"[BoomboxSync] Fehlender Sender wurde automatisch zur Radio.pls hinzugefügt: {newUrl} (Index {nextIndex - 1})");
 
-            return nextIndex - 1; // 0-basiert für die Mod zurückgeben
+            return nextIndex - 1;
+        }
+
+        public static (Vector3 pos, Quaternion rot, bool inInventory) GetBoomboxTransformAndState(RadioPlayerController instance)
+        {
+            Vector3 pos = Vector3.zero;
+            Quaternion rot = Quaternion.identity;
+            bool inInventory = false;
+
+            if (radioToAudio.TryGetValue(instance, out AudioSource audio) && audio != null)
+            {
+                pos = audio.transform.position;
+                rot = audio.transform.rotation;
+                inInventory = audio.transform.parent != null;
+            }
+
+            return (pos, rot, inInventory);
         }
     }
-
-    // --- (Hier folgen deine restlichen Harmony-Patches wie bisher: RadioConstructorPatch, TurnOn, TurnOff, Next, Previous und BoomboxPositionSender) ---
-    // [Hinweis: Lass die restlichen Patches exakt so, wie sie in deiner BoomboxPatches.cs aktuell sind!]
 
     [HarmonyPatch(typeof(RadioPlayerController), MethodType.Constructor)]
     [HarmonyPatch(new System.Type[] { typeof(GameObject), typeof(AudioSource) })]
@@ -155,16 +184,12 @@ namespace BoomboxSyncMod
                 int currentIndex = __instance.CurrentStationIndex;
                 string streamUrl = RadioTracker.GetUrlFromIndex(currentIndex);
 
-                Vector3 pos = Vector3.zero;
-                Quaternion rot = Quaternion.identity;
+                var state = RadioTracker.GetBoomboxTransformAndState(__instance);
 
-                if (RadioTracker.radioToAudio.TryGetValue(__instance, out AudioSource audio) && audio != null)
-                {
-                    pos = audio.transform.position;
-                    rot = audio.transform.rotation;
-                }
+                bool networkPlay = true;
+                if (state.inInventory && !Main.settings.PlayInInventory) networkPlay = false;
 
-                NetworkSync.SendBoomboxState(boomboxId, true, streamUrl, currentIndex, pos, rot);
+                NetworkSync.SendBoomboxState(boomboxId, networkPlay, streamUrl, currentIndex, state.pos, state.rot, "LocalPlayer", state.inInventory);
             }
         }
     }
@@ -178,16 +203,8 @@ namespace BoomboxSyncMod
 
             if (RadioTracker.radioToId.TryGetValue(__instance, out int boomboxId))
             {
-                Vector3 pos = Vector3.zero;
-                Quaternion rot = Quaternion.identity;
-
-                if (RadioTracker.radioToAudio.TryGetValue(__instance, out AudioSource audio) && audio != null)
-                {
-                    pos = audio.transform.position;
-                    rot = audio.transform.rotation;
-                }
-
-                NetworkSync.SendBoomboxState(boomboxId, false, "", 0, pos, rot);
+                var state = RadioTracker.GetBoomboxTransformAndState(__instance);
+                NetworkSync.SendBoomboxState(boomboxId, false, "", 0, state.pos, state.rot, "LocalPlayer", state.inInventory);
             }
         }
     }
@@ -204,16 +221,12 @@ namespace BoomboxSyncMod
                 int index = __instance.CurrentStationIndex;
                 string streamUrl = RadioTracker.GetUrlFromIndex(index);
 
-                Vector3 pos = Vector3.zero;
-                Quaternion rot = Quaternion.identity;
+                var state = RadioTracker.GetBoomboxTransformAndState(__instance);
 
-                if (RadioTracker.radioToAudio.TryGetValue(__instance, out AudioSource audio) && audio != null)
-                {
-                    pos = audio.transform.position;
-                    rot = audio.transform.rotation;
-                }
+                bool networkPlay = true;
+                if (state.inInventory && !Main.settings.PlayInInventory) networkPlay = false;
 
-                NetworkSync.SendBoomboxState(boomboxId, true, streamUrl, index, pos, rot);
+                NetworkSync.SendBoomboxState(boomboxId, networkPlay, streamUrl, index, state.pos, state.rot, "LocalPlayer", state.inInventory);
             }
         }
     }
@@ -230,16 +243,12 @@ namespace BoomboxSyncMod
                 int index = __instance.CurrentStationIndex;
                 string streamUrl = RadioTracker.GetUrlFromIndex(index);
 
-                Vector3 pos = Vector3.zero;
-                Quaternion rot = Quaternion.identity;
+                var state = RadioTracker.GetBoomboxTransformAndState(__instance);
 
-                if (RadioTracker.radioToAudio.TryGetValue(__instance, out AudioSource audio) && audio != null)
-                {
-                    pos = audio.transform.position;
-                    rot = audio.transform.rotation;
-                }
+                bool networkPlay = true;
+                if (state.inInventory && !Main.settings.PlayInInventory) networkPlay = false;
 
-                NetworkSync.SendBoomboxState(boomboxId, true, streamUrl, index, pos, rot);
+                NetworkSync.SendBoomboxState(boomboxId, networkPlay, streamUrl, index, state.pos, state.rot, "LocalPlayer", state.inInventory);
             }
         }
     }
@@ -253,13 +262,18 @@ namespace BoomboxSyncMod
         private Vector3 lastPosition;
         private Quaternion lastRotation;
 
+        private bool lastInInventory = false;
+        private RadioPlayerController controller;
+
         void Start()
         {
             instanceId = this.gameObject.GetInstanceID();
             lastPosition = transform.position;
             lastRotation = transform.rotation;
 
-            // Sofortige Position senden, damit der Geist von Sekunde 1 an am richtigen Ort steht
+            controller = GetComponent<RadioPlayerController>();
+            lastInInventory = (transform.parent != null);
+
             if (Main.enabled)
             {
                 NetworkSync.SendTransformPacket(instanceId, transform.position, transform.rotation);
@@ -272,19 +286,65 @@ namespace BoomboxSyncMod
             {
                 nextSendTime = Time.time + sendInterval;
 
-                if (Vector3.Distance(lastPosition, transform.position) > 0.01f ||
-                    Quaternion.Angle(lastRotation, transform.rotation) > 0.1f)
+                Vector3 currentPos = transform.position;
+                Quaternion currentRot = transform.rotation;
+
+                bool currentInInventory = (transform.parent != null);
+
+                if (currentInInventory != lastInInventory)
                 {
-                    NetworkSync.SendTransformPacket(instanceId, transform.position, transform.rotation);
-                    lastPosition = transform.position;
-                    lastRotation = transform.rotation;
+                    if (controller != null)
+                    {
+                        int index = controller.CurrentStationIndex;
+                        string url = RadioTracker.GetUrlFromIndex(index);
+
+                        bool actualPlaying = false;
+                        if (RadioTracker.radioToAudio.TryGetValue(controller, out AudioSource a) && a != null)
+                        {
+                            actualPlaying = a.isPlaying;
+                        }
+
+                        bool networkPlay = actualPlaying;
+                        if (currentInInventory && !Main.settings.PlayInInventory)
+                        {
+                            networkPlay = false;
+                        }
+
+                        NetworkSync.SendBoomboxState(instanceId, networkPlay, url, index, currentPos, currentRot, "LocalPlayer", currentInInventory);
+                    }
+                    lastInInventory = currentInInventory;
+                }
+
+                if (Vector3.Distance(lastPosition, currentPos) > 0.01f ||
+                    Quaternion.Angle(lastRotation, currentRot) > 0.1f)
+                {
+                    NetworkSync.SendTransformPacket(instanceId, currentPos, currentRot);
+                    lastPosition = currentPos;
+                    lastRotation = currentRot;
                 }
             }
         }
 
         void OnDisable()
         {
-            if (Main.enabled) NetworkSync.SendDespawnPacket(instanceId);
+            if (!Main.enabled) return;
+
+            if (controller != null)
+            {
+                int index = controller.CurrentStationIndex;
+                string url = RadioTracker.GetUrlFromIndex(index);
+
+                bool actualPlaying = false;
+                if (RadioTracker.radioToAudio.TryGetValue(controller, out AudioSource a) && a != null)
+                {
+                    actualPlaying = a.isPlaying;
+                }
+
+                bool networkPlay = actualPlaying;
+                if (!Main.settings.PlayInInventory) networkPlay = false;
+
+                NetworkSync.SendBoomboxState(instanceId, networkPlay, url, index, transform.position, transform.rotation, "LocalPlayer", true);
+            }
         }
 
         void OnDestroy()

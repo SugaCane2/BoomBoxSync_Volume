@@ -1,8 +1,9 @@
 ﻿0.2.0:
 - Komplette Änderung des Systems
 - Mute Tabelle hinzugefügt
-- 
-- 
+- Dopplereffekt entfernt
+- Einstellung hinzugefügt: Steuerung, ob das Radio im Inventar/in der Hand weiterhin den Ton an Mitspieler überträgt
+- Bugfix: Lokale "Radio.pls" wird nicht mehr dauerhaft mit den Sendern von Mitspielern zugemüllt (automatische Backup-Funktion)
 
 0.1.4:
 - Debug Logs hinzugefügt
@@ -11,10 +12,5 @@
 
 0.1.3:
 - "Übersteuerung" Lautstärke Regler für das Radio hinzugefügt
-- Löschung der "Ghost Radios" beim einstecken gefixt
+- Löschung der "Ghost Radios" beim Einstecken gefixt
 - Löschfunktion aller "Ghost Radios" in den Einstellungen hinzugefügt
-
-0.1.2:
-- Relead Button hinzugefügt
-- Maxuimum auf 100 erhöht
-- Statt Eingabefeld zum Slider mit Automatischer Übernahme Funktion

@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="BoomboxSync_Multiplayer/BoomboxSync_Multiplayer.csproj" Id="0539ee5e-b158-4089-8846-9664540c192a" />
   <Project Path="BoomBoxSync_Volume/BoomBoxSync_Volume.csproj" />
 </Solution>

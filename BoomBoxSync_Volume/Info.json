@@ -4,7 +4,6 @@
     "Author": "SugaCane",
     "Version": "0.2.1",
     "ManagerVersion": "0.27.0",
-    //"Requirements": [ "Multiplayer" ],
     "LoadAfter": [ "Multiplayer" ],
     "AssemblyName": "BoomBoxSync_Volume.dll",
     "EntryMethod": "BoomboxSyncMod.Main.Load"

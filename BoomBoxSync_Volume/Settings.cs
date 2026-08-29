@@ -45,10 +45,23 @@ namespace BoomboxSyncMod
 
             float multiplier = (float)MaxVolume / 10f;
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+            if (Main.isMultiplayerInstalled)
+            {
+                // Geändert zu Main.MP
+                Main.MP.UpdateGhostVolumes(multiplier, OverdriveBoost);
+=======
+=======
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
             // Geister-Radios existieren nur, wenn der Multiplayer aktiv ist
             if (Main.isMultiplayerInstalled)
             {
                 GhostBoomboxManager.UpdateAllGhostVolumes(multiplier, OverdriveBoost);
+<<<<<<< HEAD
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
+=======
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
             }
         }
 
@@ -162,11 +175,22 @@ namespace BoomboxSyncMod
                     ? "<b>🎛️ DJ-Pult (Spieler stummschalten)</b>"
                     : "<b>🎛️ DJ Panel (Mute Players)</b>");
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+                // Geändert zu Main.MP
+                var activeDJs = Main.MP.GetActiveDJs();
+=======
+=======
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
                 var activeDJs = GhostBoomboxManager.virtualBoomboxes.Values
                     .Select(v => v.OwnerName)
                     .Where(name => !string.IsNullOrEmpty(name))
                     .Distinct()
                     .ToList();
+<<<<<<< HEAD
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
+=======
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
 
                 if (activeDJs.Count == 0)
                 {
@@ -193,7 +217,16 @@ namespace BoomboxSyncMod
                             if (newMuted) MutedPlayers.Add(djName);
                             else MutedPlayers.Remove(djName);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+                            // Geändert zu Main.MP
+                            Main.MP.ProcessRadar();
+=======
                             GhostBoomboxManager.ProcessRadar();
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
+=======
+                            GhostBoomboxManager.ProcessRadar();
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
                         }
                         GUILayout.EndHorizontal();
                     }
@@ -207,8 +240,19 @@ namespace BoomboxSyncMod
 
                 if (GUILayout.Button(bugfixBtnText, GUILayout.Width(350)))
                 {
+<<<<<<< HEAD
+<<<<<<< HEAD
+                    // Geändert zu Main.MP
+                    Main.MP.ClearAllGhosts();
+                    Main.MP.SendClearAllPacket();
+=======
                     GhostBoomboxManager.ClearAllGhosts();
                     NetworkSync.SendClearAllPacket();
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
+=======
+                    GhostBoomboxManager.ClearAllGhosts();
+                    NetworkSync.SendClearAllPacket();
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
                 }
             }
         }

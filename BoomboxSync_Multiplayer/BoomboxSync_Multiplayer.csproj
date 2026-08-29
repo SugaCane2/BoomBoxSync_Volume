@@ -4,20 +4,13 @@
     <TargetFramework>net48</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
+    <BaseOutputPath>F:\Repos\DerailValleyMods\BoomBoxSync_Volume\bin</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Changelog.txt" />
-    <None Remove="Info.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Changelog.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Info.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <ProjectReference Include="..\BoomBoxSync_Volume\BoomBoxSync_Volume.csproj">
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +24,14 @@
     </Reference>
     <Reference Include="DV.RadioPlayer">
       <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Derail Valley\DerailValley_Data\Managed\DV.RadioPlayer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Multiplayer">
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\Multiplayer2\Multiplayer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MultiplayerAPI">
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\Multiplayer2\MultiplayerAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PlaylistsNET">
@@ -63,18 +64,6 @@
     </Reference>
     <Reference Include="UnityModManager">
       <HintPath>..\..\..\Uniti Modmanager\UnityModManagerInstaller\UnityModManager.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Disclamer.md">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Update="mscorlib">
       <Private>False</Private>
     </Reference>
   </ItemGroup>

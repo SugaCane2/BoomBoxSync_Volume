@@ -140,7 +140,14 @@ namespace BoomboxSyncMod
             if (__0 == null) return;
             if (__0.name.StartsWith("GhostBoombox")) return;
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
             // Multiplayer Registrierung und Komponenten nur laden, wenn MP aktiv ist
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
+=======
+            // Multiplayer Registrierung und Komponenten nur laden, wenn MP aktiv ist
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
             if (Main.isMultiplayerInstalled)
             {
                 int id = __0.GetInstanceID();
@@ -192,7 +199,8 @@ namespace BoomboxSyncMod
                 bool networkPlay = true;
                 if (state.inInventory && !Main.settings.PlayInInventory) networkPlay = false;
 
-                NetworkSync.SendBoomboxState(boomboxId, networkPlay, streamUrl, currentIndex, state.pos, state.rot, "LocalPlayer", state.inInventory);
+                // Geändert zu Main.MP
+                Main.MP.SendBoomboxState(boomboxId, networkPlay, streamUrl, currentIndex, state.pos, state.rot, "LocalPlayer", state.inInventory);
             }
         }
     }
@@ -207,7 +215,8 @@ namespace BoomboxSyncMod
             if (RadioTracker.radioToId.TryGetValue(__instance, out int boomboxId))
             {
                 var state = RadioTracker.GetBoomboxTransformAndState(__instance);
-                NetworkSync.SendBoomboxState(boomboxId, false, "", 0, state.pos, state.rot, "LocalPlayer", state.inInventory);
+                // Geändert zu Main.MP
+                Main.MP.SendBoomboxState(boomboxId, false, "", 0, state.pos, state.rot, "LocalPlayer", state.inInventory);
             }
         }
     }
@@ -229,7 +238,8 @@ namespace BoomboxSyncMod
                 bool networkPlay = true;
                 if (state.inInventory && !Main.settings.PlayInInventory) networkPlay = false;
 
-                NetworkSync.SendBoomboxState(boomboxId, networkPlay, streamUrl, index, state.pos, state.rot, "LocalPlayer", state.inInventory);
+                // Geändert zu Main.MP
+                Main.MP.SendBoomboxState(boomboxId, networkPlay, streamUrl, index, state.pos, state.rot, "LocalPlayer", state.inInventory);
             }
         }
     }
@@ -251,7 +261,8 @@ namespace BoomboxSyncMod
                 bool networkPlay = true;
                 if (state.inInventory && !Main.settings.PlayInInventory) networkPlay = false;
 
-                NetworkSync.SendBoomboxState(boomboxId, networkPlay, streamUrl, index, state.pos, state.rot, "LocalPlayer", state.inInventory);
+                // Geändert zu Main.MP
+                Main.MP.SendBoomboxState(boomboxId, networkPlay, streamUrl, index, state.pos, state.rot, "LocalPlayer", state.inInventory);
             }
         }
     }
@@ -281,7 +292,8 @@ namespace BoomboxSyncMod
 
             if (Main.enabled)
             {
-                NetworkSync.SendTransformPacket(instanceId, transform.position, transform.rotation);
+                // Geändert zu Main.MP
+                Main.MP.SendTransformPacket(instanceId, transform.position, transform.rotation);
             }
         }
 
@@ -317,7 +329,8 @@ namespace BoomboxSyncMod
                             networkPlay = false;
                         }
 
-                        NetworkSync.SendBoomboxState(instanceId, networkPlay, url, index, currentPos, currentRot, "LocalPlayer", currentInInventory);
+                        // Geändert zu Main.MP
+                        Main.MP.SendBoomboxState(instanceId, networkPlay, url, index, currentPos, currentRot, "LocalPlayer", currentInInventory);
                     }
                     lastInInventory = currentInInventory;
                 }
@@ -325,7 +338,8 @@ namespace BoomboxSyncMod
                 if (Vector3.Distance(lastPosition, currentPos) > 0.01f ||
                     Quaternion.Angle(lastRotation, currentRot) > 0.1f)
                 {
-                    NetworkSync.SendTransformPacket(instanceId, currentPos, currentRot);
+                    // Geändert zu Main.MP
+                    Main.MP.SendTransformPacket(instanceId, currentPos, currentRot);
                     lastPosition = currentPos;
                     lastRotation = currentRot;
                 }
@@ -350,13 +364,23 @@ namespace BoomboxSyncMod
                 bool networkPlay = actualPlaying;
                 if (!Main.settings.PlayInInventory) networkPlay = false;
 
-                NetworkSync.SendBoomboxState(instanceId, networkPlay, url, index, transform.position, transform.rotation, "LocalPlayer", true);
+                // Geändert zu Main.MP
+                Main.MP.SendBoomboxState(instanceId, networkPlay, url, index, transform.position, transform.rotation, "LocalPlayer", true);
             }
         }
 
         void OnDestroy()
         {
+<<<<<<< HEAD
+<<<<<<< HEAD
+            // Geändert zu Main.MP
+            if (Main.enabled && Main.isMultiplayerInstalled) Main.MP.SendDespawnPacket(instanceId);
+=======
             if (Main.enabled && Main.isMultiplayerInstalled) NetworkSync.SendDespawnPacket(instanceId);
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
+=======
+            if (Main.enabled && Main.isMultiplayerInstalled) NetworkSync.SendDespawnPacket(instanceId);
+>>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
         }
     }
 

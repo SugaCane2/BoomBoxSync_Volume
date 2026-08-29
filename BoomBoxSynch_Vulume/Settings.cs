@@ -5,26 +5,30 @@ using System.Linq;
 
 namespace BoomboxSyncMod
 {
+    public enum ModLanguage
+    {
+        Deutsch,
+        English
+    }
+
     public class Settings : UnityModManager.ModSettings, IDrawable
     {
-        [Draw("Max. Lautstärke-Reichweite (Standard: 10)", Min = 1, Max = 100)]
+        // Ausgewählte Sprache
+        public ModLanguage SelectedLanguage = ModLanguage.Deutsch;
+
         public int MaxVolume = 10;
-
-        [Draw("Overdrive Boost (Standard: 1.0, Achtung: Laut!)", Min = 0.01, Max = 10.00)]
         public float OverdriveBoost = 1f;
-
-        [Draw("Radar-Puffer (Meter, bis der Stream im Hintergrund gekappt wird). <b>Empfohlener Standard: 50</b>", Min = 10, Max = 500)]
         public int CullingDistance = 50;
-
-        [Draw("Debug-Logs in der Konsole anzeigen")]
-        public bool EnableDebugLogs = true;
-
-        // --- NEU: Das Feature für das Inventar/Hand ---
-        [Draw("Radios spielen in der Hand / im Inventar weiter")]
+        public bool EnableDebugLogs = false;
         public bool PlayInInventory = true;
 
-        // V2.0 Feature: Speicher für stummgeschaltete Spieler
+        [HideInInspector]
         public List<string> MutedPlayers = new List<string>();
+
+        // Private Strings für flüssige Texteingaben (werden nicht in der XML gespeichert)
+        private string _maxVolStr;
+        private string _boostStr;
+        private string _cullingStr;
 
         public override void Save(UnityModManager.ModEntry modEntry)
         {
@@ -47,13 +51,114 @@ namespace BoomboxSyncMod
 
         public void Draw(UnityModManager.ModEntry modEntry)
         {
-            Settings self = this;
-            UnityModManager.UI.DrawFields(ref self, modEntry, DrawFieldMask.Any, OnChange);
+            bool isGerman = SelectedLanguage == ModLanguage.Deutsch;
+
+            // Initialisiere die Textfelder einmalig beim Öffnen des Menüs
+            if (_maxVolStr == null) _maxVolStr = MaxVolume.ToString();
+            if (_boostStr == null) _boostStr = OverdriveBoost.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (_cullingStr == null) _cullingStr = CullingDistance.ToString();
+
+            // --- SPRACHAUSWAHL / LANGUAGE SELECTOR ---
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(isGerman ? "<b>Sprache / Language:</b>" : "<b>Language / Sprache:</b>", GUILayout.Width(150));
+
+            if (GUILayout.Toggle(SelectedLanguage == ModLanguage.Deutsch, "Deutsch", GUILayout.Width(80)))
+            {
+                SelectedLanguage = ModLanguage.Deutsch;
+            }
+            if (GUILayout.Toggle(SelectedLanguage == ModLanguage.English, "English", GUILayout.Width(80)))
+            {
+                SelectedLanguage = ModLanguage.English;
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(15);
+
+            // --- EINSTELLUNGEN (Slider + Textfeld kombiniert) ---
+
+            // Max Range (Slider + Text)
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(isGerman ? "Max. Reichweite (1-100):" : "Max Range (1-100):", GUILayout.Width(250));
+
+            int newMaxVol = (int)GUILayout.HorizontalSlider(MaxVolume, 1f, 100f, GUILayout.Width(200));
+            if (newMaxVol != MaxVolume)
+            {
+                MaxVolume = newMaxVol;
+                _maxVolStr = MaxVolume.ToString(); // Textfeld aktualisieren, wenn Slider bewegt wird
+                OnChange();
+            }
+
+            _maxVolStr = GUILayout.TextField(_maxVolStr, GUILayout.Width(50));
+            if (int.TryParse(_maxVolStr, out int parsedMaxVol) && parsedMaxVol != MaxVolume)
+            {
+                MaxVolume = Mathf.Clamp(parsedMaxVol, 1, 100);
+                OnChange(); // Slider aktualisiert sich automatisch mit
+            }
+            GUILayout.EndHorizontal();
+
+            // Overdrive Boost (Slider + Text)
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(isGerman ? "Overdrive Boost (0.01-10.0):" : "Overdrive Boost (0.01-10.0):", GUILayout.Width(250));
+
+            float newBoost = GUILayout.HorizontalSlider(OverdriveBoost, 0.01f, 10f, GUILayout.Width(200));
+            if (Mathf.Abs(newBoost - OverdriveBoost) > 0.001f)
+            {
+                OverdriveBoost = Mathf.Round(newBoost * 100f) / 100f; // Auf 2 Nachkommastellen runden
+                _boostStr = OverdriveBoost.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                OnChange();
+            }
+
+            _boostStr = GUILayout.TextField(_boostStr, GUILayout.Width(50));
+            string safeBoostStr = _boostStr.Replace(',', '.'); // Akzeptiert Komma und Punkt
+            if (float.TryParse(safeBoostStr, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float parsedBoost))
+            {
+                if (Mathf.Abs(parsedBoost - OverdriveBoost) > 0.001f)
+                {
+                    OverdriveBoost = Mathf.Clamp(parsedBoost, 0.01f, 10f);
+                    OnChange();
+                }
+            }
+            GUILayout.EndHorizontal();
+
+            // Culling Distance (Slider + Text)
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(isGerman ? "Radar-Puffer in Metern (10-500):" : "Radar Buffer in Meters (10-500):", GUILayout.Width(250));
+
+            int newCulling = (int)GUILayout.HorizontalSlider(CullingDistance, 10f, 500f, GUILayout.Width(200));
+            if (newCulling != CullingDistance)
+            {
+                CullingDistance = newCulling;
+                _cullingStr = CullingDistance.ToString();
+                OnChange();
+            }
+
+            _cullingStr = GUILayout.TextField(_cullingStr, GUILayout.Width(50));
+            if (int.TryParse(_cullingStr, out int parsedCulling) && parsedCulling != CullingDistance)
+            {
+                CullingDistance = Mathf.Clamp(parsedCulling, 10, 500);
+                OnChange();
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            // Toggles (Checkboxes)
+            bool newDebug = GUILayout.Toggle(EnableDebugLogs, isGerman
+                ? " Debug-Logs in der Konsole anzeigen"
+                : " Show Debug Logs in console");
+            if (newDebug != EnableDebugLogs) EnableDebugLogs = newDebug;
+
+            bool newInventory = GUILayout.Toggle(PlayInInventory, isGerman
+                ? " Radios spielen in der Hand / im Inventar für andere weiter"
+                : " Radios continue playing in hand / inventory for others");
+            if (newInventory != PlayInInventory) PlayInInventory = newInventory;
 
             GUILayout.Space(20);
 
-            // --- DIE MUTE-TABELLE ---
-            GUILayout.Label("<b>🎛️ DJ-Pult (Spieler stummschalten)</b>");
+            // --- DIE MUTE-TABELLE / DJ PANEL ---
+            GUILayout.Label(isGerman
+                ? "<b>🎛️ DJ-Pult (Spieler stummschalten)</b>"
+                : "<b>🎛️ DJ Panel (Mute Players)</b>");
 
             var activeDJs = GhostBoomboxManager.virtualBoomboxes.Values
                 .Select(v => v.OwnerName)
@@ -63,7 +168,9 @@ namespace BoomboxSyncMod
 
             if (activeDJs.Count == 0)
             {
-                GUILayout.Label("<i>Aktuell sind keine fremden Radios in der Welt bekannt.</i>");
+                GUILayout.Label(isGerman
+                    ? "<i>Aktuell sind keine fremden Radios in der Welt bekannt.</i>"
+                    : "<i>No foreign radios currently detected in world.</i>");
             }
             else
             {
@@ -73,7 +180,11 @@ namespace BoomboxSyncMod
                     GUILayout.Label(djName, GUILayout.Width(200));
 
                     bool isMuted = MutedPlayers.Contains(djName);
-                    bool newMuted = GUILayout.Toggle(isMuted, isMuted ? " 🔇 Stummgeschaltet" : " 🔊 Hörbar");
+                    string buttonText = isGerman
+                        ? (isMuted ? " 🔇 Stummgeschaltet" : " 🔊 Hörbar")
+                        : (isMuted ? " 🔇 Muted" : " 🔊 Audible");
+
+                    bool newMuted = GUILayout.Toggle(isMuted, buttonText);
 
                     if (newMuted != isMuted)
                     {
@@ -88,7 +199,11 @@ namespace BoomboxSyncMod
 
             GUILayout.Space(20);
 
-            if (GUILayout.Button("Bugfix: Alle Geister-Radios (weltweit) löschen", GUILayout.Width(350)))
+            string bugfixBtnText = isGerman
+                ? "Bugfix: Alle Geister-Radios (weltweit) löschen"
+                : "Bugfix: Clear all ghost radios (world)";
+
+            if (GUILayout.Button(bugfixBtnText, GUILayout.Width(350)))
             {
                 GhostBoomboxManager.ClearAllGhosts();
                 NetworkSync.SendClearAllPacket();

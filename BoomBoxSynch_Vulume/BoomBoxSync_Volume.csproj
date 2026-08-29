@@ -20,11 +20,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Multiplayer">
-      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\Multiplayer2\Multiplayer.dll</HintPath>
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\Multiplayer\Multiplayer.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MultiplayerAPI">
-      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\Multiplayer2\MultiplayerAPI.dll</HintPath>
+      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Derail Valley\Mods\Multiplayer\MultiplayerAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PlaylistsNET">

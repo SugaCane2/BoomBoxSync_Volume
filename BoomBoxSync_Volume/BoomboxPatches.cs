@@ -11,7 +11,6 @@ namespace BoomboxSyncMod
         public static Dictionary<RadioPlayerController, int> radioToId = new Dictionary<RadioPlayerController, int>();
         public static Dictionary<RadioPlayerController, AudioSource> radioToAudio = new Dictionary<RadioPlayerController, AudioSource>();
 
-        // --- NEU: Backup-Funktionen für die Radio.pls ---
         public static string[] GetPlaylistBackup()
         {
             string path = RadioPlayerController.GetPlaylistPath();
@@ -29,7 +28,6 @@ namespace BoomboxSyncMod
             File.WriteAllLines(path, backupLines);
             BoomboxLog.Info("[BoomboxSync] Temporärer Sender geladen. Eigene Radio.pls wurde erfolgreich wiederhergestellt.");
         }
-        // --------------------------------------------------
 
         public static bool IsLocalRadioId(int id)
         {
@@ -142,15 +140,20 @@ namespace BoomboxSyncMod
             if (__0 == null) return;
             if (__0.name.StartsWith("GhostBoombox")) return;
 
-            int id = __0.GetInstanceID();
-            RadioTracker.radioToId[__instance] = id;
-            BoomboxLog.Info($"[BoomboxSync] Lokales Radio registriert mit ID: {id}");
-
-            if (__0.GetComponent<BoomboxPositionSender>() == null)
+            // Multiplayer Registrierung und Komponenten nur laden, wenn MP aktiv ist
+            if (Main.isMultiplayerInstalled)
             {
-                __0.AddComponent<BoomboxPositionSender>();
+                int id = __0.GetInstanceID();
+                RadioTracker.radioToId[__instance] = id;
+                BoomboxLog.Info($"[BoomboxSync] Lokales Radio registriert mit ID: {id}");
+
+                if (__0.GetComponent<BoomboxPositionSender>() == null)
+                {
+                    __0.AddComponent<BoomboxPositionSender>();
+                }
             }
 
+            // Lokaler Boost MUSS immer ausgeführt werden (auch im Singleplayer)
             if (__1 != null && Main.enabled)
             {
                 RadioTracker.radioToAudio[__instance] = __1;
@@ -177,7 +180,7 @@ namespace BoomboxSyncMod
     {
         static void Postfix(RadioPlayerController __instance)
         {
-            if (!Main.enabled) return;
+            if (!Main.enabled || !Main.isMultiplayerInstalled) return;
 
             if (RadioTracker.radioToId.TryGetValue(__instance, out int boomboxId))
             {
@@ -199,7 +202,7 @@ namespace BoomboxSyncMod
     {
         static void Postfix(RadioPlayerController __instance)
         {
-            if (!Main.enabled) return;
+            if (!Main.enabled || !Main.isMultiplayerInstalled) return;
 
             if (RadioTracker.radioToId.TryGetValue(__instance, out int boomboxId))
             {
@@ -214,7 +217,7 @@ namespace BoomboxSyncMod
     {
         static void Postfix(RadioPlayerController __instance)
         {
-            if (!Main.enabled) return;
+            if (!Main.enabled || !Main.isMultiplayerInstalled) return;
 
             if (RadioTracker.radioToId.TryGetValue(__instance, out int boomboxId))
             {
@@ -236,7 +239,7 @@ namespace BoomboxSyncMod
     {
         static void Postfix(RadioPlayerController __instance)
         {
-            if (!Main.enabled) return;
+            if (!Main.enabled || !Main.isMultiplayerInstalled) return;
 
             if (RadioTracker.radioToId.TryGetValue(__instance, out int boomboxId))
             {
@@ -267,6 +270,8 @@ namespace BoomboxSyncMod
 
         void Start()
         {
+            if (!Main.isMultiplayerInstalled) return;
+
             instanceId = this.gameObject.GetInstanceID();
             lastPosition = transform.position;
             lastRotation = transform.rotation;
@@ -282,6 +287,8 @@ namespace BoomboxSyncMod
 
         void Update()
         {
+            if (!Main.isMultiplayerInstalled) return;
+
             if (Time.time >= nextSendTime)
             {
                 nextSendTime = Time.time + sendInterval;
@@ -327,7 +334,7 @@ namespace BoomboxSyncMod
 
         void OnDisable()
         {
-            if (!Main.enabled) return;
+            if (!Main.enabled || !Main.isMultiplayerInstalled) return;
 
             if (controller != null)
             {
@@ -349,7 +356,7 @@ namespace BoomboxSyncMod
 
         void OnDestroy()
         {
-            if (Main.enabled) NetworkSync.SendDespawnPacket(instanceId);
+            if (Main.enabled && Main.isMultiplayerInstalled) NetworkSync.SendDespawnPacket(instanceId);
         }
     }
 

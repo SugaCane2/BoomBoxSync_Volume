@@ -11,10 +11,17 @@ namespace BoomboxSyncMod
         public static UnityModManager.ModEntry mod;
         public static Harmony harmony;
 
+        // NEU: Globale Variable, um zu prüfen, ob der Multiplayer da ist
+        public static bool isMultiplayerInstalled;
+
         static bool Load(UnityModManager.ModEntry modEntry)
         {
             mod = modEntry;
             settings = Settings.Load<Settings>(modEntry);
+
+            // Prüfen, ob der Multiplayer-Mod installiert und aktiv ist
+            var mpMod = UnityModManager.FindMod("Multiplayer");
+            isMultiplayerInstalled = mpMod != null && mpMod.Active;
 
             modEntry.OnToggle = OnToggle;
             modEntry.OnGUI = OnGUI;
@@ -31,15 +38,26 @@ namespace BoomboxSyncMod
             if (enabled)
             {
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
-                NetworkSync.Initialize();
 
-                // V2.0: Hier starten wir unser neues Radar-System!
-                GhostBoomboxManager.InitializeRadar();
+                // Multiplayer-Systeme nur starten, wenn die Mod da ist
+                if (isMultiplayerInstalled)
+                {
+                    NetworkSync.Initialize();
+                    GhostBoomboxManager.InitializeRadar();
+                    BoomboxLog.Info("[BoomboxSync] Multiplayer erkannt! Sync-Features aktiviert.");
+                }
+                else
+                {
+                    BoomboxLog.Info("[BoomboxSync] Kein Multiplayer erkannt. Mod läuft im Singleplayer-Modus (nur Volume Boost).");
+                }
             }
             else
             {
                 harmony.UnpatchAll(modEntry.Info.Id);
-                NetworkSync.Uninitialize();
+                if (isMultiplayerInstalled)
+                {
+                    NetworkSync.Uninitialize();
+                }
             }
             return true;
         }
@@ -58,7 +76,7 @@ namespace BoomboxSyncMod
         public static void ApplyLiveSettings()
         {
             float multiplier = (float)settings.MaxVolume / 10f;
-            float boost = settings.OverdriveBoost; // Hier ist kein (float) mehr nötig, da es bereits eine Kommazahl ist
+            float boost = settings.OverdriveBoost;
 
             foreach (var audio in RadioTracker.radioToAudio.Values)
             {
@@ -75,7 +93,11 @@ namespace BoomboxSyncMod
                 }
             }
 
-            GhostBoomboxManager.UpdateAllGhostVolumes(multiplier, boost);
+            // Geister-Radios nur updaten, wenn MP aktiv ist
+            if (isMultiplayerInstalled)
+            {
+                GhostBoomboxManager.UpdateAllGhostVolumes(multiplier, boost);
+            }
         }
     }
 }

@@ -1,4 +1,8 @@
-﻿0.2.0:
+﻿GER:
+0.2.1:
+- Multiplayer is jetzt optional
+
+0.2.0:
 - Komplette Änderung des Systems
 - Mute Tabelle hinzugefügt
 - Dopplereffekt entfernt
@@ -14,3 +18,24 @@
 - "Übersteuerung" Lautstärke Regler für das Radio hinzugefügt
 - Löschung der "Ghost Radios" beim Einstecken gefixt
 - Löschfunktion aller "Ghost Radios" in den Einstellungen hinzugefügt
+
+ENG:
+0.2.1:
+- Multiplayer is now optional
+
+0.2.0:
+- Complete overhaul of the system
+- Added mute table
+- Removed Doppler effect
+- Added setting: Controls whether the radio in the inventory or in your hand continues to broadcast sound to other players
+- Bug fix: Local “Radio.pls” file is no longer constantly cluttered with other players’ stations (automatic backup function)
+
+0.1.4:
+- Added debug logs
+- Fixed “Ghost Radio.” Should now sync properly
+- Fixed settings
+
+0.1.3:
+- Added “override” volume control for the radio
+- Fixed the issue where “Ghost Radios” were deleted upon insertion
+- Added a function to delete all “Ghost Radios” in the settings

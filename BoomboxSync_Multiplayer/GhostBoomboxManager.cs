@@ -159,6 +159,9 @@ namespace BoomboxSyncMod
             audio.minDistance = 2f * multiplier;
             audio.volume = 1f;
 
+            // NEU: Tunnel-Akustik auch für Multiplayer-Boomboxen
+            ghost.AddComponent<BoomboxAcoustics>();
+
             AudioBooster booster = ghost.AddComponent<AudioBooster>();
             booster.VolumeMultiplier = Main.settings.OverdriveBoost;
 
@@ -171,7 +174,6 @@ namespace BoomboxSyncMod
             int localIndex = RadioTracker.GetIndexFromUrl(state.StreamUrl);
             if (localIndex == -1)
             {
-                // --- NEU: Backup-Logik für saubere lokale Playlists ---
                 string[] originalPlaylist = RadioTracker.GetPlaylistBackup();
 
                 localIndex = RadioTracker.AddUrlToPlaylist(state.StreamUrl);

@@ -13,30 +13,14 @@ namespace BoomboxSyncMod
         public static UnityModManager.ModEntry mod;
         public static Harmony harmony;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         public static bool isMultiplayerInstalled;
-
-        // Die Brücke zum Addon
         public static IMultiplayerAddon MP;
 
-=======
-        // NEU: Globale Variable, um zu prüfen, ob der Multiplayer da ist
-        public static bool isMultiplayerInstalled;
-
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
-=======
-        // NEU: Globale Variable, um zu prüfen, ob der Multiplayer da ist
-        public static bool isMultiplayerInstalled;
-
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
         static bool Load(UnityModManager.ModEntry modEntry)
         {
             mod = modEntry;
             settings = Settings.Load<Settings>(modEntry);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
             var mpMod = UnityModManager.FindMod("Multiplayer");
             isMultiplayerInstalled = mpMod != null && mpMod.Active;
 
@@ -66,17 +50,6 @@ namespace BoomboxSyncMod
                 }
             }
 
-=======
-=======
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
-            // Prüfen, ob der Multiplayer-Mod installiert und aktiv ist
-            var mpMod = UnityModManager.FindMod("Multiplayer");
-            isMultiplayerInstalled = mpMod != null && mpMod.Active;
-
-<<<<<<< HEAD
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
-=======
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
             modEntry.OnToggle = OnToggle;
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
@@ -93,48 +66,20 @@ namespace BoomboxSyncMod
             {
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-<<<<<<< HEAD
-<<<<<<< HEAD
                 if (isMultiplayerInstalled && MP != null)
                 {
                     MP.Initialize();
                     BoomboxLog.Info("[BoomboxSync] Sync-Features aktiviert.");
-=======
-=======
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
-                // Multiplayer-Systeme nur starten, wenn die Mod da ist
-                if (isMultiplayerInstalled)
-                {
-                    NetworkSync.Initialize();
-                    GhostBoomboxManager.InitializeRadar();
-                    BoomboxLog.Info("[BoomboxSync] Multiplayer erkannt! Sync-Features aktiviert.");
                 }
                 else
                 {
-                    BoomboxLog.Info("[BoomboxSync] Kein Multiplayer erkannt. Mod läuft im Singleplayer-Modus (nur Volume Boost).");
-<<<<<<< HEAD
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
-=======
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
+                    BoomboxLog.Info("[BoomboxSync] Mod läuft im Singleplayer-Modus (nur Volume Boost).");
                 }
             }
             else
             {
                 harmony.UnpatchAll(modEntry.Info.Id);
-<<<<<<< HEAD
-<<<<<<< HEAD
                 if (isMultiplayerInstalled && MP != null) MP.Uninitialize();
-=======
-=======
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
-                if (isMultiplayerInstalled)
-                {
-                    NetworkSync.Uninitialize();
-                }
-<<<<<<< HEAD
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
-=======
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
             }
             return true;
         }
@@ -167,23 +112,9 @@ namespace BoomboxSyncMod
                 }
             }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-            // Weitergabe an das Addon
             if (isMultiplayerInstalled && MP != null)
             {
                 MP.UpdateGhostVolumes(multiplier, boost);
-=======
-=======
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
-            // Geister-Radios nur updaten, wenn MP aktiv ist
-            if (isMultiplayerInstalled)
-            {
-                GhostBoomboxManager.UpdateAllGhostVolumes(multiplier, boost);
-<<<<<<< HEAD
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
-=======
->>>>>>> 0b4a913f71c00fc4d97f19b1ef99babb1f1bbe6c
             }
         }
     }

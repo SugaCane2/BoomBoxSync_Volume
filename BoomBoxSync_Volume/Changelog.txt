@@ -1,6 +1,9 @@
 ﻿GER:
+0.2.2:
+- Behoben, dass man keinen Tunnelefekt außerhalb des Tunnels hört, wenn das Radio im Tunnel steht.
+
 0.2.1:
-- Multiplayer is jetzt optional
+- Multiplayer ist jetzt optional
 
 0.2.0:
 - Komplette Änderung des Systems
@@ -20,6 +23,9 @@
 - Löschfunktion aller "Ghost Radios" in den Einstellungen hinzugefügt
 
 ENG:
+0.2.2:
+- Fixed an issue where you couldn't hear the tunnel effect outside the tunnel when the radio was inside it.
+
 0.2.1:
 - Multiplayer is now optional
 
